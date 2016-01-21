@@ -28,6 +28,5 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/opt/workspace/easy-router-engine/lib/com.google.ortools.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
