@@ -12,14 +12,17 @@ import br.com.easyrouter.engine.api.Order;
 import br.com.easyrouter.engine.api.RouteRequest;
 import br.com.easyrouter.engine.api.RouteResponse;
 import br.com.easyrouter.engine.api.Vehicle;
+import br.com.easyrouter.engine.util.Converter;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.Location;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.VehicleRoutingProblem.FleetSize;
+import jsprit.core.problem.driver.Driver;
 import jsprit.core.problem.driver.DriverImpl;
 import jsprit.core.problem.job.Shipment;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.problem.solution.route.VehicleRoute;
 import jsprit.core.problem.solution.route.activity.TimeWindow;
 import jsprit.core.problem.vehicle.VehicleImpl;
 import jsprit.core.problem.vehicle.VehicleType;
@@ -33,6 +36,7 @@ public class Solver {
     private final int WEIGHT_INDEX = 0;
     private final int VOLUME_INDEX = 1;
 
+    private RouteRequest routeRequest = null;
     private Set<VehicleImpl> vehicleImpls = new HashSet<VehicleImpl>();
     private Set<Shipment> shipments = new HashSet<Shipment>();
     private VehicleRoutingTransportCostsMatrix costMatrix = null;
@@ -43,6 +47,7 @@ public class Solver {
      * @param routeRequest
      */
     public Solver(RouteRequest routeRequest) {
+    	this.routeRequest = routeRequest;
         DistributionCenter distributionCenter = routeRequest.getOrders().iterator().next().getDistributionCenter();
         this.vehicleImpls = this.loadVehicles(routeRequest.getVehicles(), distributionCenter);
         this.shipments = this.loadShipments(routeRequest.getOrders(), distributionCenter);
@@ -113,7 +118,7 @@ public class Solver {
      *
      * @return {@link RouteResponse} calculated
      */
-    public RouteResponse solve() {
+    public VehicleRoutingProblemSolution solve() {
 
 		VehicleRoutingProblem problem = VehicleRoutingProblem.Builder
 				.newInstance()
@@ -125,8 +130,7 @@ public class Solver {
 		
 		VehicleRoutingAlgorithm algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, "input/algorithmConfig.xml");
 		Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-		VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
-		
-		return null;
+		return Solutions.bestOf(solutions);
     }
+
 }

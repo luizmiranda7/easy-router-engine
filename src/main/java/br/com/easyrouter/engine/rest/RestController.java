@@ -1,6 +1,4 @@
-
 package br.com.easyrouter.engine.rest;
-
 
 import java.io.Writer;
 
@@ -48,12 +46,9 @@ public class RestController {
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     public Response getMsg(String routeRequestAsString) {
-
         RouteRequest routeRequest = (RouteRequest) xstream.fromXML(routeRequestAsString);
         Solver solver = new Solver(routeRequest);
-        RouteResponse routeResponse = solver.solve();
-
-        return Response.status(200).entity(routeResponse).build();
+        return Response.status(200).entity(solver.solve()).build();
     }
 
 }
