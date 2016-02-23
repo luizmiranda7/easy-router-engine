@@ -12,7 +12,6 @@ import br.com.easyrouter.engine.api.Order;
 import br.com.easyrouter.engine.api.RouteRequest;
 import br.com.easyrouter.engine.api.RouteResponse;
 import br.com.easyrouter.engine.api.Vehicle;
-import br.com.easyrouter.engine.util.Converter;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.Location;
@@ -82,8 +81,10 @@ public class Solver {
                     VehicleTypeImpl.Builder.newInstance(vehicle.getExternalCode().toString())
                             .addCapacityDimension(this.WEIGHT_INDEX, vehicle.getTotalWeight().intValue())
                             .addCapacityDimension(this.VOLUME_INDEX, vehicle.getTotalVolume().intValue())
-                            .setCostPerDistance(vehicle.getCostPerDistance()).setCostPerTime(vehicle.getCostPerTime())
-                            .setMaxVelocity(vehicle.getMaxVelocity()).build();
+                            .setCostPerTime(vehicle.getCostPerTime())
+                            .setCostPerDistance(vehicle.getCostPerDistance())
+                            .setMaxVelocity(vehicle.getMaxVelocity().doubleValue())
+                            .build();
 
             result.add(VehicleImpl.Builder.newInstance(vehicle.getExternalCode().toString())
                     .setStartLocation(Location.newInstance(distributionCenter.getExternalCode().toString()))
@@ -122,8 +123,8 @@ public class Solver {
 
 		VehicleRoutingProblem problem = VehicleRoutingProblem.Builder
 				.newInstance()
-				.setRoutingCost(this.costMatrix)
 				.setFleetSize(FleetSize.FINITE)
+				.setRoutingCost(this.costMatrix)
 				.addAllVehicles(this.vehicleImpls)
 				.addAllJobs(this.shipments)
 				.build();
