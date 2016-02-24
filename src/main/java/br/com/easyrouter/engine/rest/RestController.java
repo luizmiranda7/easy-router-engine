@@ -10,9 +10,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import br.com.easyrouter.engine.api.RouteRequest;
-import br.com.easyrouter.engine.api.RouteResponse;
 import br.com.easyrouter.engine.solver.Solver;
 
+/**
+ * Class responsible to map the rest access to the routing functionalities
+ * 
+ * @author luizmiranda
+ */
 @Path("/")
 public class RestController {
 

@@ -10,18 +10,14 @@ import br.com.easyrouter.engine.api.DirectionLeg;
 import br.com.easyrouter.engine.api.DistributionCenter;
 import br.com.easyrouter.engine.api.Order;
 import br.com.easyrouter.engine.api.RouteRequest;
-import br.com.easyrouter.engine.api.RouteResponse;
 import br.com.easyrouter.engine.api.Vehicle;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.Location;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.VehicleRoutingProblem.FleetSize;
-import jsprit.core.problem.driver.Driver;
-import jsprit.core.problem.driver.DriverImpl;
 import jsprit.core.problem.job.Shipment;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.problem.solution.route.VehicleRoute;
 import jsprit.core.problem.solution.route.activity.TimeWindow;
 import jsprit.core.problem.vehicle.VehicleImpl;
 import jsprit.core.problem.vehicle.VehicleType;
@@ -29,7 +25,10 @@ import jsprit.core.problem.vehicle.VehicleTypeImpl;
 import jsprit.core.util.Solutions;
 import jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
-
+/**
+ * Class responsible to translate the {@link RouteRequest} object into a {@link VehicleRoutingProblem} model and resolve it with the best solution
+ * @author luizmiranda
+ */
 public class Solver {
 
     private final int WEIGHT_INDEX = 0;
@@ -41,19 +40,24 @@ public class Solver {
     private VehicleRoutingTransportCostsMatrix costMatrix = null;
 
     /**
-     * Constructs a capacitated vehicle routing problem with time windows.
+     * Constructs a vehicle routing problem with time windows
      *
      * @param routeRequest
      */
     public Solver(RouteRequest routeRequest) {
-    	this.routeRequest = routeRequest;
         DistributionCenter distributionCenter = routeRequest.getOrders().iterator().next().getDistributionCenter();
         this.vehicleImpls = this.loadVehicles(routeRequest.getVehicles(), distributionCenter);
         this.shipments = this.loadShipments(routeRequest.getOrders(), distributionCenter);
         this.costMatrix = this.loadCostMatrix(routeRequest.getDirectionLegs());
+        this.routeRequest = routeRequest;
         
     }
 
+    /**
+     * Inputs all {@link DirectionLeg} from {@link RouteRequest} into {@link VehicleRoutingProblem} model
+     * @param directionLegs
+     * @return
+     */
     private VehicleRoutingTransportCostsMatrix loadCostMatrix(Set<DirectionLeg> directionLegs) {
     	VehicleRoutingTransportCostsMatrix.Builder costMatrixBuilder = VehicleRoutingTransportCostsMatrix.Builder.newInstance(true);
     	
@@ -73,6 +77,13 @@ public class Solver {
     	return costMatrixBuilder.build();
 	}
 
+    /**
+     * Loads all vehicle available from {@link RouteRequest}
+     * 
+     * @param vehicles
+     * @param distributionCenter
+     * @return
+     */
 	private Set<VehicleImpl> loadVehicles(Set<Vehicle> vehicles, DistributionCenter distributionCenter) {
 		HashSet<VehicleImpl> result = new HashSet<VehicleImpl>();
 		
@@ -95,6 +106,13 @@ public class Solver {
         return result;
     }
 
+	/**
+	 * Loads all orders from {@link RouteRequest}
+	 * 
+	 * @param orders
+	 * @param distributionCenter
+	 * @return
+	 */
     private Set<Shipment> loadShipments(Set<Order> orders, DistributionCenter distributionCenter) {
     	HashSet<Shipment> result = new HashSet<Shipment>();
         for (Order order : orders) {
@@ -115,7 +133,7 @@ public class Solver {
     }
 
     /**
-     * Solves the current routing problem.
+     * Solves the current routing problem
      *
      * @return {@link RouteResponse} calculated
      */
@@ -133,5 +151,13 @@ public class Solver {
 		Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
 		return Solutions.bestOf(solutions);
     }
+
+	public RouteRequest getRouteRequest() {
+		return routeRequest;
+	}
+
+	public void setRouteRequest(RouteRequest routeRequest) {
+		this.routeRequest = routeRequest;
+	}
 
 }
