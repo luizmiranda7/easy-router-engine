@@ -2,8 +2,11 @@
 package br.com.easyrouter.engine.solver;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.commons.lang.time.DateUtils;
 
 import br.com.easyrouter.engine.api.DeliveryPoint;
 import br.com.easyrouter.engine.api.DirectionLeg;
@@ -38,6 +41,7 @@ public class Solver {
     private Set<VehicleImpl> vehicleImpls = new HashSet<VehicleImpl>();
     private Set<Shipment> shipments = new HashSet<Shipment>();
     private VehicleRoutingTransportCostsMatrix costMatrix = null;
+    private Date now = new Date();
 
     /**
      * Constructs a vehicle routing problem with time windows
@@ -123,9 +127,10 @@ public class Solver {
                     .addSizeDimension(this.VOLUME_INDEX, order.getVolume())
                     .setDeliveryServiceTime(deliveryPoint.getDeliveryDuration())
                     .setDeliveryTimeWindow(TimeWindow.newInstance(0.0, order.getDeadline().getTime()))
-                    .setPickupServiceTime(distributionCenter.getPrepareDuration())
                     .setDeliveryLocation(Location.newInstance(deliveryPoint.getRoutePointExternalCode().toString()))
-                    .setPickupLocation(Location.newInstance(deliveryPoint.getRoutePointExternalCode().toString()))
+                    .setPickupServiceTime(distributionCenter.getPrepareDuration())
+                    .setPickupLocation(Location.newInstance(distributionCenter.getRoutePointExternalCode().toString()))
+                    .setPickupTimeWindow(TimeWindow.newInstance(now.getTime(), DateUtils.addYears(now, 1).getTime()))
                     .setName(order.getName()).build());
         };
         
@@ -142,9 +147,9 @@ public class Solver {
 		VehicleRoutingProblem problem = VehicleRoutingProblem.Builder
 				.newInstance()
 				.setFleetSize(FleetSize.FINITE)
+				.addAllJobs(this.shipments)
 				.setRoutingCost(this.costMatrix)
 				.addAllVehicles(this.vehicleImpls)
-				.addAllJobs(this.shipments)
 				.build();
 		
 		VehicleRoutingAlgorithm algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, "input/algorithmConfig.xml");
