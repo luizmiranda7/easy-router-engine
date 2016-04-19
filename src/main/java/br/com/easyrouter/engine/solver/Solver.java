@@ -102,8 +102,8 @@ public class Solver {
                             .build();
 
             result.add(VehicleImpl.Builder.newInstance(vehicle.getExternalCode().toString())
-                    .setStartLocation(Location.newInstance(distributionCenter.getExternalCode().toString()))
-                    .setEndLocation(Location.newInstance(distributionCenter.getExternalCode().toString()))
+                    .setStartLocation(Location.newInstance(distributionCenter.getRoutePointExternalCode().toString()))
+                    .setEndLocation(Location.newInstance(distributionCenter.getRoutePointExternalCode().toString()))
                     .setEarliestStart(vehicle.getEarliestStart().getTime())
                     .setLatestArrival(vehicle.getLatestEnd().getTime()).setType(vehicleType).build());
         }
