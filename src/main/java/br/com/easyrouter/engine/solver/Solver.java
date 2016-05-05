@@ -34,8 +34,8 @@ import jsprit.core.util.VehicleRoutingTransportCostsMatrix;
  */
 public class Solver {
 
-    private final int WEIGHT_INDEX = 0;
-    private final int VOLUME_INDEX = 1;
+    private static final int WEIGHT_INDEX = 0;
+    private static final int VOLUME_INDEX = 1;
 
     private RouteRequest routeRequest = null;
     private Set<VehicleImpl> vehicleImpls = new HashSet<VehicleImpl>();
@@ -123,14 +123,14 @@ public class Solver {
             DeliveryPoint deliveryPoint = order.getDeliveryPoint();
 
             result.add(Shipment.Builder.newInstance(order.getExternalCode().toString())
-                    .addSizeDimension(this.WEIGHT_INDEX, order.getWeight())
-                    .addSizeDimension(this.VOLUME_INDEX, order.getVolume())
+                    .addSizeDimension(WEIGHT_INDEX, order.getWeight())
+                    .addSizeDimension(VOLUME_INDEX, order.getVolume())
                     .setDeliveryServiceTime(deliveryPoint.getDeliveryDuration())
-                    .setDeliveryTimeWindow(TimeWindow.newInstance(0.0, order.getDeadline().getTime()))
+                    .setDeliveryTimeWindow(TimeWindow.newInstance(order.getDeliverTimeWindow().getStart().getTime(), order.getDeliverTimeWindow().getEnd().getTime()))
                     .setDeliveryLocation(Location.newInstance(deliveryPoint.getRoutePointExternalCode().toString()))
                     .setPickupServiceTime(distributionCenter.getPrepareDuration())
                     .setPickupLocation(Location.newInstance(distributionCenter.getRoutePointExternalCode().toString()))
-                    .setPickupTimeWindow(TimeWindow.newInstance(now.getTime(), DateUtils.addYears(now, 1).getTime()))
+					.setDeliveryTimeWindow(TimeWindow.newInstance(order.getPickupTimeWindow().getStart().getTime(), order.getPickupTimeWindow().getEnd().getTime()))
                     .setName(order.getName()).build());
         };
         

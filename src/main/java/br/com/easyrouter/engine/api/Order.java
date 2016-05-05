@@ -1,13 +1,12 @@
 package br.com.easyrouter.engine.api;
 
-import java.util.Date;
-
 public class Order {
 	
 	private Integer priorityLevel;
 	private Integer weight;
 	private Integer volume;
-	private Date deadline;
+	private TimeWindow deliverTimeWindow;
+	private TimeWindow pickupTimeWindow;
 	private Double penalty;
 	private OrderStatus status;
 	
@@ -37,18 +36,6 @@ public class Order {
 	 */
 	public void setWeight(Integer weight) {
 		this.weight = weight;
-	}
-	/**
-	 * @return the deadline
-	 */
-	public Date getDeadline() {
-		return deadline;
-	}
-	/**
-	 * @param deadline the deadline to set
-	 */
-	public void setDeadline(Date deadline) {
-		this.deadline = deadline;
 	}
 	/**
 	 * @return the status
@@ -116,6 +103,23 @@ public class Order {
 	public Integer getVolume() {
 		return volume;
 	}
+
+	public TimeWindow getDeliverTimeWindow() {
+		return deliverTimeWindow;
+	}
+
+	public void setDeliverTimeWindow(TimeWindow deliverTimeWindow) {
+		this.deliverTimeWindow = deliverTimeWindow;
+	}
+
+	public TimeWindow getPickupTimeWindow() {
+		return pickupTimeWindow;
+	}
+
+	public void setPickupTimeWindow(TimeWindow pickupTimeWindow) {
+		this.pickupTimeWindow = pickupTimeWindow;
+	}
+
 	/**
 	 * @param volume the volume to set
 	 */
@@ -127,9 +131,6 @@ public class Order {
 		return new StringBuilder(this.distributionCenter.getName())
 				.append(" -> ")
 				.append(this.deliveryPoint.getName())
-				.append(" : ")
-				.append(this.externalCode.toString())
 				.toString();
 	}
-	
 }
