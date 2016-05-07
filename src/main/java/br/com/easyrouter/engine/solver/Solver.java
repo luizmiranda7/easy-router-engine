@@ -54,7 +54,7 @@ public class Solver {
         this.shipments = this.loadShipments(routeRequest.getOrders(), distributionCenter);
         this.costMatrix = this.loadCostMatrix(routeRequest.getDirectionLegs());
         this.routeRequest = routeRequest;
-        
+
     }
 
     /**
@@ -63,34 +63,34 @@ public class Solver {
      * @return
      */
     private VehicleRoutingTransportCostsMatrix loadCostMatrix(Set<DirectionLeg> directionLegs) {
-    	VehicleRoutingTransportCostsMatrix.Builder costMatrixBuilder = VehicleRoutingTransportCostsMatrix.Builder.newInstance(true);
-    	
-    	for (DirectionLeg directionLeg : directionLegs) {
-    		String initialPointId = directionLeg.getInitialPoint().toString();
-    		String finalPointId = directionLeg.getFinalPoint().toString();
-    		costMatrixBuilder.addTransportDistance(
-					initialPointId,
-					finalPointId, 
-					directionLeg.getDistance());
-			
-    		costMatrixBuilder.addTransportTime(
-					initialPointId,
-					finalPointId,
-					directionLeg.getDuration());
-		}
-    	return costMatrixBuilder.build();
-	}
+        VehicleRoutingTransportCostsMatrix.Builder costMatrixBuilder = VehicleRoutingTransportCostsMatrix.Builder.newInstance(true);
+
+        for (DirectionLeg directionLeg : directionLegs) {
+            String initialPointId = directionLeg.getInitialPoint().toString();
+            String finalPointId = directionLeg.getFinalPoint().toString();
+            costMatrixBuilder.addTransportDistance(
+                    initialPointId,
+                    finalPointId,
+                    directionLeg.getDistance());
+
+            costMatrixBuilder.addTransportTime(
+                    initialPointId,
+                    finalPointId,
+                    directionLeg.getDuration());
+        }
+        return costMatrixBuilder.build();
+    }
 
     /**
      * Loads all vehicle available from {@link RouteRequest}
-     * 
+     *
      * @param vehicles
      * @param distributionCenter
      * @return
      */
-	private Set<VehicleImpl> loadVehicles(Set<Vehicle> vehicles, DistributionCenter distributionCenter) {
-		HashSet<VehicleImpl> result = new HashSet<VehicleImpl>();
-		
+    private Set<VehicleImpl> loadVehicles(Set<Vehicle> vehicles, DistributionCenter distributionCenter) {
+        HashSet<VehicleImpl> result = new HashSet<VehicleImpl>();
+
         for (Vehicle vehicle : vehicles) {
             VehicleType vehicleType =
                     VehicleTypeImpl.Builder.newInstance(vehicle.getExternalCode().toString())
@@ -110,15 +110,15 @@ public class Solver {
         return result;
     }
 
-	/**
-	 * Loads all orders from {@link RouteRequest}
-	 * 
-	 * @param orders
-	 * @param distributionCenter
-	 * @return
-	 */
+    /**
+     * Loads all orders from {@link RouteRequest}
+     *
+     * @param orders
+     * @param distributionCenter
+     * @return
+     */
     private Set<Shipment> loadShipments(Set<Order> orders, DistributionCenter distributionCenter) {
-    	HashSet<Shipment> result = new HashSet<Shipment>();
+        HashSet<Shipment> result = new HashSet<Shipment>();
         for (Order order : orders) {
             DeliveryPoint deliveryPoint = order.getDeliveryPoint();
 
@@ -130,39 +130,38 @@ public class Solver {
                     .setDeliveryLocation(Location.newInstance(deliveryPoint.getRoutePointExternalCode().toString()))
                     .setPickupServiceTime(distributionCenter.getPrepareDuration())
                     .setPickupLocation(Location.newInstance(distributionCenter.getRoutePointExternalCode().toString()))
-					.setDeliveryTimeWindow(TimeWindow.newInstance(order.getPickupTimeWindow().getStart().getTime(), order.getPickupTimeWindow().getEnd().getTime()))
-                    .setName(order.getName()).build());
-        };
-        
+                    .setDeliveryTimeWindow(TimeWindow.newInstance(order.getPickupTimeWindow().getStart().getTime(), order.getPickupTimeWindow().getEnd().getTime()))
+                    .setName(order.getName())
+                    .build());
+        }
+
         return result;
     }
 
     /**
      * Solves the current routing problem
-     *
-     * @return {@link RouteResponse} calculated
      */
     public VehicleRoutingProblemSolution solve() {
 
-		VehicleRoutingProblem problem = VehicleRoutingProblem.Builder
-				.newInstance()
-				.setFleetSize(FleetSize.FINITE)
-				.addAllJobs(this.shipments)
-				.setRoutingCost(this.costMatrix)
-				.addAllVehicles(this.vehicleImpls)
-				.build();
-		
-		VehicleRoutingAlgorithm algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, "input/algorithmConfig.xml");
-		Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-		return Solutions.bestOf(solutions);
+        VehicleRoutingProblem problem = VehicleRoutingProblem.Builder
+                .newInstance()
+                .setFleetSize(FleetSize.FINITE)
+                .addAllJobs(this.shipments)
+                .setRoutingCost(this.costMatrix)
+                .addAllVehicles(this.vehicleImpls)
+                .build();
+
+        VehicleRoutingAlgorithm algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, "input/algorithmConfig.xml");
+        Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
+        return Solutions.bestOf(solutions);
     }
 
-	public RouteRequest getRouteRequest() {
-		return routeRequest;
-	}
+    public RouteRequest getRouteRequest() {
+        return routeRequest;
+    }
 
-	public void setRouteRequest(RouteRequest routeRequest) {
-		this.routeRequest = routeRequest;
-	}
+    public void setRouteRequest(RouteRequest routeRequest) {
+        this.routeRequest = routeRequest;
+    }
 
 }
