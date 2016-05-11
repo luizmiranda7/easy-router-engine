@@ -9,6 +9,7 @@ public class Driver {
 	private ExternalCode externalCode;
 	private Date earliestStart;
 	private Date latestEnd;
+	private DistributionCenter currentDistributionCenter;
 	
 	/**
 	 * @return the person
@@ -69,6 +70,14 @@ public class Driver {
 	 */
 	public void setLatestEnd(Date latestEnd) {
 		this.latestEnd = latestEnd;
+	}
+	
+	public DistributionCenter getCurrentDistributionCenter() {
+		return currentDistributionCenter;
+	}
+	
+	public void setCurrentDistributionCenter(DistributionCenter currentDistributionCenter) {
+		this.currentDistributionCenter = currentDistributionCenter;
 	}
 	
 }

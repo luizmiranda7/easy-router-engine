@@ -3,7 +3,7 @@ package br.com.easyrouter.engine.api;
 import java.util.Date;
 
 /**
- * Created by luizmiranda on 04/05/16.
+ * Created by luiz.miranda on 04/05/16.
  */
 public class TimeWindow {
 

@@ -11,22 +11,24 @@ import org.apache.commons.lang.time.DateUtils;
 import br.com.easyrouter.engine.api.DeliveryPoint;
 import br.com.easyrouter.engine.api.DirectionLeg;
 import br.com.easyrouter.engine.api.DistributionCenter;
+import com.graphhopper.jsprit.core.problem.driver.Driver;
+import com.graphhopper.jsprit.core.problem.driver.DriverImpl;
 import br.com.easyrouter.engine.api.Order;
 import br.com.easyrouter.engine.api.RouteRequest;
 import br.com.easyrouter.engine.api.Vehicle;
-import jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
-import jsprit.core.problem.Location;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.VehicleRoutingProblem.FleetSize;
-import jsprit.core.problem.job.Shipment;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.problem.solution.route.activity.TimeWindow;
-import jsprit.core.problem.vehicle.VehicleImpl;
-import jsprit.core.problem.vehicle.VehicleType;
-import jsprit.core.problem.vehicle.VehicleTypeImpl;
-import jsprit.core.util.Solutions;
-import jsprit.core.util.VehicleRoutingTransportCostsMatrix;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
+import com.graphhopper.jsprit.core.problem.Location;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem.FleetSize;
+import com.graphhopper.jsprit.core.problem.job.Shipment;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
+import com.graphhopper.jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
 /**
  * Class responsible to translate the {@link RouteRequest} object into a {@link VehicleRoutingProblem} model and resolve it with the best solution
@@ -40,6 +42,7 @@ public class Solver {
     private RouteRequest routeRequest = null;
     private Set<VehicleImpl> vehicleImpls = new HashSet<VehicleImpl>();
     private Set<Shipment> shipments = new HashSet<Shipment>();
+    private Set<Driver> drivers = new HashSet<Driver>();
     private VehicleRoutingTransportCostsMatrix costMatrix = null;
     private Date now = new Date();
 
@@ -53,6 +56,7 @@ public class Solver {
         this.vehicleImpls = this.loadVehicles(routeRequest.getVehicles(), distributionCenter);
         this.shipments = this.loadShipments(routeRequest.getOrders(), distributionCenter);
         this.costMatrix = this.loadCostMatrix(routeRequest.getDirectionLegs());
+        this.drivers = this.loadDrivers(routeRequest.getDrivers());
         this.routeRequest = routeRequest;
 
     }
@@ -96,7 +100,9 @@ public class Solver {
                     VehicleTypeImpl.Builder.newInstance(vehicle.getExternalCode().toString())
                             .addCapacityDimension(this.WEIGHT_INDEX, vehicle.getTotalWeight().intValue())
                             .addCapacityDimension(this.VOLUME_INDEX, vehicle.getTotalVolume().intValue())
-                            .setCostPerTime(vehicle.getCostPerTime())
+                            .setCostPerServiceTime(vehicle.getCostPerTime())
+                            .setCostPerTransportTime(vehicle.getCostPerTime())
+                            .setCostPerWaitingTime(vehicle.getCostPerTime())
                             .setCostPerDistance(vehicle.getCostPerDistance())
                             .setMaxVelocity(vehicle.getMaxVelocity().doubleValue())
                             .build();
@@ -136,6 +142,19 @@ public class Solver {
         }
 
         return result;
+    }
+    
+    private Set<Driver> loadDrivers(Set<br.com.easyrouter.engine.api.Driver> drivers){
+        Set<Driver> result = new HashSet<Driver>();
+    	for (br.com.easyrouter.engine.api.Driver driver : drivers) {
+    		DriverImpl driverImpl = new DriverImpl(driver.getExternalCode().toString());
+    		driverImpl.setEarliestStart(driver.getEarliestStart().getTime());
+    		driverImpl.setLatestEnd(driver.getLatestEnd().getTime());
+    		driverImpl.setHomeLocation(driver.getCurrentDistributionCenter().getRoutePointExternalCode().toString());
+			result.add(driverImpl);
+		}
+    	
+    	return result;
     }
 
     /**

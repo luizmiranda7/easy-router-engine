@@ -4,20 +4,14 @@ import java.util.List;
 
 public class Calendar {
 
-	private List<Interval> intervals;
+	private List<TimeWindow> timeWindows;
 
-	/**
-	 * @return the intervals
-	 */
-	public List<Interval> getIntervals() {
-		return intervals;
+	public List<TimeWindow> getTimeWindows() {
+		return timeWindows;
 	}
 
-	/**
-	 * @param intervals the intervals to set
-	 */
-	public void setIntervals(List<Interval> intervals) {
-		this.intervals = intervals;
+	public void setTimeWindows(List<TimeWindow> timeWindows) {
+		this.timeWindows = timeWindows;
 	}
-	
+
 }
